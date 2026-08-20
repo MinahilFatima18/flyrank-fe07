@@ -1,14 +1,16 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
+const scoreLeadSchema = z.object({
+  companyName: z.string().describe('Name of the company'),
+  industry: z.string().describe('Industry vertical, e.g. SaaS, retail, fintech'),
+  companySize: z.number().optional().describe('Employee count if known'),
+});
+
 export const scoreLead = tool({
   description: 'Scores a sales lead 0-100 based on company info',
-  parameters: z.object({
-    companyName: z.string().describe('Name of the company'),
-    industry: z.string().describe('Industry vertical, e.g. SaaS, retail, fintech'),
-    companySize: z.number().optional().describe('Employee count if known'),
-  }),
-  execute: async ({ companyName, industry, companySize }) => {
+  parameters: scoreLeadSchema,
+  execute: async ({ companyName, industry, companySize }: z.infer<typeof scoreLeadSchema>) => {
     if (!companyName || companyName.trim().length === 0) {
       throw new Error('Company name is required to score a lead.');
     }
